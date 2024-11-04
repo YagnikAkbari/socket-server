@@ -15,6 +15,12 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
   },
 });
+app.get("/", (req, res, next) => {
+  res.status(200).send({ message: "Backend Launched✈️." });
+});
+app.get("/user", (req, res, next) => {
+  res.status(200).send({ name: "Yagnik Akbari", email: "abc@gmail.info" });
+});
 io.on("connection", (socket) => {
   const count = io.engine.clientsCount;
   console.log("socket", socket?.id, count);
