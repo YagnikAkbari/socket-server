@@ -1,19 +1,13 @@
 const { createServer } = require("http");
+const express = require("express");
 const { Server } = require("socket.io");
+require("dotenv").config();
 
-const hostname = "127.0.0.1";
-const port = 5050;
+const PORT = process.env.PORT || 5000;
 
-const server = createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader("Content-Type", "text/plain");
+const app = express();
 
-  if (req.url === "/") {
-    res.end("Hello, world!");
-  } else {
-    res.end("This is a basic Node server");
-  }
-});
+const server = createServer(app);
 
 const io = new Server(server, {
   cors: {
@@ -22,14 +16,19 @@ const io = new Server(server, {
   },
 });
 io.on("connection", (socket) => {
-  console.log("socket", socket?.id);
+  const count = io.engine.clientsCount;
+  console.log("socket", socket?.id, count);
 
-  socket.on("create-foo", (value) => {  
+  socket.on("create-foo", (value) => {
     console.log("foovalue", value);
     io.emit("send-foo", value);
   });
+
+  socket.on("disconnect", () => {
+    console.log("terminate socket", socket?.id);
+  });
 });
 
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
+server.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}/`);
 });
